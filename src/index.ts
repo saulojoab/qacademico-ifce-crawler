@@ -118,10 +118,10 @@ async function getDocumentRequest({
   const response = await axios.post(
     `https://qacademico.ifce.edu.br/webapp/api/documentos/aluno/modelos-de-documentos/${idModel}/solicitacao`,
     {
-      schoolYear,
-      idModel,
-      schoolPeriod: schoolPeriod,
-      requiresCustomization: requiresCustomization,
+      anoLetivo: schoolYear,
+      idModelo: idModel,
+      periodoLetivo: schoolPeriod,
+      requerPersonalizacao: requiresCustomization,
     },
     {
       withCredentials: true,
