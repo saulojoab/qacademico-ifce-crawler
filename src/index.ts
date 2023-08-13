@@ -18,7 +18,7 @@ async function getAuthenticationCookies({
   const page = await browser.newPage();
   await page.goto("https://qacademico.ifce.edu.br/qacademico/alunos");
   await page.type("#txtLogin", username);
-  await page.type("#txtSenha", password);
+  await page.type("#txtPassword", password);
   await page.click("#btnOk");
   await page.waitForNavigation();
   const cookies = await page.cookies();
@@ -36,12 +36,12 @@ async function getAuthenticationCookies({
     .map((cookie) => `${cookie.name}=${cookie.value}`)
     .join("; ");
 
-  //console.log(await getDiarios(parsedCookies));
-  //console.log(await getDocumentosSolicitados(parsedCookies));
-  console.log(await getModelosDeDocumentos(parsedCookies));
+  //console.log(await getDiary(parsedCookies));
+  //console.log(await getRequestedDocuments(parsedCookies));
+  console.log(await getDocumentTemplates(parsedCookies));
 })();
 
-async function getDiarios(cookies: string) {
+async function getDiary(cookies: string) {
   const response = await axios.get(
     "https://qacademico.ifce.edu.br/webapp/api/diarios/aluno/diarios",
     {
@@ -55,7 +55,7 @@ async function getDiarios(cookies: string) {
   return response.data;
 }
 
-async function getDocumentosSolicitados(cookies: string) {
+async function getRequestedDocuments(cookies: string) {
   const response = await axios.get(
     "https://qacademico.ifce.edu.br/webapp/api/documentos/aluno/solicitacoes-realizadas",
     {
@@ -69,7 +69,7 @@ async function getDocumentosSolicitados(cookies: string) {
   return response.data;
 }
 
-async function getModelosDeDocumentos(cookies: string) {
+async function getDocumentTemplates(cookies: string) {
   const response = await axios.get(
     "https://qacademico.ifce.edu.br/webapp/api/documentos/aluno/modelos-de-documentos",
     {
@@ -83,45 +83,45 @@ async function getModelosDeDocumentos(cookies: string) {
   return response.data;
 }
 
-interface SolicitacaoDocumentoProps {
+interface DocumentRequestProps {
   cookies: string;
-  anoLetivo: number;
-  idModelo: number;
-  periodoLetivo: number;
-  requerPersonalizacao: number;
+  schoolYear: number;
+  idModel: number;
+  schoolPeriod: number;
+  requiresCustomization: number;
 }
 
-interface SolicitacaoDocumentoResponse {
-  informacoesArquivo: {
+interface DocumentRequestResponse {
+  informationFile: {
     id: string;
-    nome: string;
+    name: string;
   };
-  solicitacaoRealizada: {
+  requestMade: {
     id: string;
-    nome: string;
-    dataDeSolicitacao: string;
-    situacao: number;
-    dataLimiteDeLiberacao: string | null;
-    anoLetivo: string | null;
-    periodoLetivo: string | null;
-    diasParaLiberacao: number | null;
+    name: string;
+    dateOfRequest: string;
+    situation: number;
+    dateLimitDeLiberation: string | null;
+    schoolYear: string | null;
+    schoolPeriod: string | null;
+    daysToRelease: number | null;
   };
 }
 
-async function getSolicitacaoDeDocumento({
+async function getDocumentRequest({
   cookies,
-  anoLetivo,
-  idModelo,
-  periodoLetivo,
-  requerPersonalizacao,
-}: SolicitacaoDocumentoProps) {
+  schoolYear,
+  idModel,
+  schoolPeriod,
+  requiresCustomization,
+}: DocumentRequestProps) {
   const response = await axios.post(
-    `https://qacademico.ifce.edu.br/webapp/api/documentos/aluno/modelos-de-documentos/${idModelo}/solicitacao`,
+    `https://qacademico.ifce.edu.br/webapp/api/documentos/aluno/modelos-de-documentos/${idModel}/solicitacao`,
     {
-      anoLetivo: anoLetivo,
-      idModelo: idModelo,
-      periodoLetivo: periodoLetivo,
-      requerPersonalizacao: requerPersonalizacao,
+      anoLetivo: schoolYear,
+      idModelo: idModel,
+      periodoLetivo: schoolPeriod,
+      requerPersonalizacao: requiresCustomization,
     },
     {
       withCredentials: true,
@@ -131,5 +131,5 @@ async function getSolicitacaoDeDocumento({
     }
   );
 
-  return response.data as SolicitacaoDocumentoResponse;
+  return response.data as DocumentRequestResponse;
 }
